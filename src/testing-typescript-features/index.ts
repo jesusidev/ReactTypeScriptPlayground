@@ -153,8 +153,8 @@ function getName(): [string, string] {
   logger(12, "function", "This is a test message");
   const testname = setname("logi", "tech");
   const arrName = testname.split(" ");
-  const firstName = arrName[0],
-    lastName = arrName[1];
+  const firstName = arrName[0] ?? "Unknown",
+    lastName = arrName[1] ?? "Unknown";
   return [firstName, lastName];
 }
 const [firstName, lastName] = getName();
@@ -194,4 +194,4 @@ export const routes: Routes = {
   },
 } as const;
 // Autcompletion happens
-console.log("Routes::", routes.HOME.path);
+console.log("Routes::", routes.HOME?.path);

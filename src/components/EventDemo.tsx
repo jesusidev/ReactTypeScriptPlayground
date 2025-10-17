@@ -1,4 +1,3 @@
-import React from "react";
 import { useAnalyticsDispatcher } from "../events/use-analytics-events";
 import { useNotifyDispatcher } from "../events/use-notification-events";
 
@@ -41,6 +40,7 @@ export function EventDemo() {
 
       <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
         <button
+          type="button"
           onClick={handleSuccessDemo}
           style={{
             padding: "0.5rem 1rem",
@@ -55,6 +55,7 @@ export function EventDemo() {
         </button>
 
         <button
+          type="button"
           onClick={handleErrorDemo}
           style={{
             padding: "0.5rem 1rem",
@@ -69,6 +70,7 @@ export function EventDemo() {
         </button>
 
         <button
+          type="button"
           onClick={handleWarningDemo}
           style={{
             padding: "0.5rem 1rem",
@@ -83,6 +85,7 @@ export function EventDemo() {
         </button>
 
         <button
+          type="button"
           onClick={handleInfoDemo}
           style={{
             padding: "0.5rem 1rem",

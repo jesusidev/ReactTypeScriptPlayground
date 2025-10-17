@@ -3,7 +3,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useAnalyticsDispatcher } from "../../events/use-analytics-events";
 import { useCartEvent } from "../../events/use-cart-events";
 import { useNotifyDispatcher } from "../../events/use-notification-events";
-import { CartContext, type CartItem } from "./cart-context";
+import type { CartItem } from "./cart-context";
+import { CartContext } from "./cart-context";
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);

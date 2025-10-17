@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import { useContext } from "react";
 import { useAnalyticsDispatcher } from "../events/use-analytics-events";
 import { ThemeContext } from "../state/theme/theme-context";
 
@@ -62,6 +62,7 @@ export function Theme() {
       </div>
 
       <button
+        type="button"
         onClick={handleToggle}
         style={{
           padding: "0.75rem 1.5rem",
@@ -82,7 +83,15 @@ export function Theme() {
           e.currentTarget.style.transform = "scale(1.05)";
           e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.2)";
         }}
+        onFocus={(e) => {
+          e.currentTarget.style.transform = "scale(1.05)";
+          e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.2)";
+        }}
         onMouseOut={(e) => {
+          e.currentTarget.style.transform = "scale(1)";
+          e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.15)";
+        }}
+        onBlur={(e) => {
           e.currentTarget.style.transform = "scale(1)";
           e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.15)";
         }}

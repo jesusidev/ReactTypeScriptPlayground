@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useState } from "react";
 import { useNotificationEvent } from "../events/use-notification-events";
 
 interface Notification {
@@ -23,7 +23,7 @@ export function NotificationCenter() {
         type,
         timestamp: Date.now(),
         duration,
-        action,
+        ...(action && { action }),
       };
 
       setNotifications((prev) => [...prev, notification]);
@@ -85,6 +85,7 @@ export function NotificationCenter() {
         >
           <span>{notification.message}</span>
           <button
+            type="button"
             onClick={() => removeNotification(notification.id)}
             style={{
               background: "none",

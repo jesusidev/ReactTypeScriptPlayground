@@ -1,4 +1,4 @@
-import React, { Activity, useEffect, useEffectEvent, useState } from "react";
+import { Activity, useEffect, useEffectEvent, useId, useState } from "react";
 import { useAnalyticsDispatcher } from "../events/use-analytics-events";
 
 interface CounterLoggerProps {
@@ -28,7 +28,12 @@ export function CounterLogger({ label, showDetails }: CounterLoggerProps) {
     // Even though logCount uses `label`, it doesn't need to be in dependencies
     // because useEffectEvent ensures it always reads the latest `label`
     logCount();
-  }, [count]); // Note: label is NOT in dependencies!
+  }, [
+    // This effect only re-runs when `count` changes
+    // Even though logCount uses `label`, it doesn't need to be in dependencies
+    // because useEffectEvent ensures it always reads the latest `label`
+    logCount,
+  ]); // Note: label is NOT in dependencies!
 
   const handleIncrement = () => {
     const newCount = count + 1;
@@ -76,6 +81,7 @@ export function CounterLogger({ label, showDetails }: CounterLoggerProps) {
           }}
         >
           <button
+            type="button"
             onClick={handleDecrement}
             style={{
               padding: "0.5rem 1rem",
@@ -106,6 +112,7 @@ export function CounterLogger({ label, showDetails }: CounterLoggerProps) {
           </div>
 
           <button
+            type="button"
             onClick={handleIncrement}
             style={{
               padding: "0.5rem 1rem",
@@ -121,6 +128,7 @@ export function CounterLogger({ label, showDetails }: CounterLoggerProps) {
           </button>
 
           <button
+            type="button"
             onClick={handleReset}
             style={{
               padding: "0.5rem 1rem",
@@ -187,6 +195,7 @@ interface DetailsProps {
 function DetailsComponent({ counter }: DetailsProps) {
   const [text, setText] = useState("");
   const [mountTime] = useState(() => new Date().toLocaleTimeString());
+  const inputId = useId();
 
   useEffect(() => {
     console.log(
@@ -231,6 +240,7 @@ function DetailsComponent({ counter }: DetailsProps) {
 
       <div style={{ marginTop: "0.5rem" }}>
         <label
+          htmlFor={inputId}
           style={{
             display: "block",
             marginBottom: "0.25rem",
@@ -241,6 +251,7 @@ function DetailsComponent({ counter }: DetailsProps) {
           Type something (state preserved when hidden):
         </label>
         <input
+          id={inputId}
           type="text"
           placeholder="Your text will be preserved..."
           value={text}

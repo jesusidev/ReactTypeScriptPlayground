@@ -1,4 +1,5 @@
-import { type Dispatch, useCallback, useEffect } from "react";
+import type { Dispatch } from "react";
+import { useCallback, useEffect } from "react";
 import type { CustomWindowEventMap } from "../events";
 
 // Define custom event payload types

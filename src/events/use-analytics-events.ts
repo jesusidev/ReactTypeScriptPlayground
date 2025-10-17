@@ -29,16 +29,30 @@ export const useAnalyticsDispatcher = () => {
 
   return {
     track: (event: string, properties?: Record<string, unknown>) =>
-      trackEvent({ event, properties, timestamp: Date.now() }),
+      trackEvent({
+        event,
+        timestamp: Date.now(),
+        ...(properties && { properties }),
+      }),
 
     pageView: (page: string, title?: string) =>
-      trackPageView({ page, title, referrer: document.referrer }),
+      trackPageView({
+        page,
+        referrer: document.referrer,
+        ...(title && { title }),
+      }),
 
     userAction: (
       action: string,
       category: string,
       label?: string,
       value?: number
-    ) => trackUserAction({ action, category, label, value }),
+    ) =>
+      trackUserAction({
+        action,
+        category,
+        ...(label && { label }),
+        ...(value !== undefined && { value }),
+      }),
   };
 };

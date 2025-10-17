@@ -1,5 +1,4 @@
-import React, { useContext, useState } from "react";
-import { createRoot } from "react-dom/client";
+import { useContext, useState } from "react";
 import { AnalyticsLogger } from "./components/AnalyticsLogger";
 import { CounterLogger } from "./components/CounterLogger";
 import { EventDemo } from "./components/EventDemo";
@@ -57,6 +56,7 @@ function AppContent() {
               component unmounts but state is preserved.
             </div>
             <button
+              type="button"
               onClick={() => setShowDetails((s) => !s)}
               style={{
                 padding: "0.75rem 1.5rem",
@@ -75,7 +75,15 @@ function AppContent() {
                 e.currentTarget.style.transform = "translateY(-1px)";
                 e.currentTarget.style.boxShadow = "0 4px 8px rgba(0,0,0,0.15)";
               }}
+              onFocus={(e) => {
+                e.currentTarget.style.transform = "translateY(-1px)";
+                e.currentTarget.style.boxShadow = "0 4px 8px rgba(0,0,0,0.15)";
+              }}
               onMouseOut={(e) => {
+                e.currentTarget.style.transform = "translateY(0)";
+                e.currentTarget.style.boxShadow = "0 2px 4px rgba(0,0,0,0.1)";
+              }}
+              onBlur={(e) => {
                 e.currentTarget.style.transform = "translateY(0)";
                 e.currentTarget.style.boxShadow = "0 2px 4px rgba(0,0,0,0.1)";
               }}

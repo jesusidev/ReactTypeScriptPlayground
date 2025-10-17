@@ -1,4 +1,3 @@
-import React from "react";
 import { useAnalyticsEvent } from "../events/use-analytics-events";
 import { useCartEvent } from "../events/use-cart-events";
 

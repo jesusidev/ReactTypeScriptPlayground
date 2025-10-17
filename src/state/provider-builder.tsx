@@ -1,5 +1,4 @@
-import type React from "react";
-import type { JSXElementConstructor, ReactNode } from "react";
+import type { JSXElementConstructor, ReactElement, ReactNode } from "react";
 
 type InferProps<T> = T extends JSXElementConstructor<infer P> ? P : never;
 
@@ -21,21 +20,16 @@ export type ProvidersProps<
   providers: InferProviderArray<T>;
 };
 
-function ProviderStack<T extends ReadonlyArray<JSXElementConstructor<any>>>({
-  providers,
-  children,
-}: ProvidersProps<T>): React.ReactElement {
-  return providers.reduceRight(
-    (node, [Provider, props]) => (
-      <Provider {...(props as any)}>{node}</Provider>
-    ),
-    <>{children}</>
-  );
-}
-
 export function Providers<T extends ReadonlyArray<JSXElementConstructor<any>>>({
   children,
   providers,
-}: ProvidersProps<T>): React.ReactElement {
-  return <ProviderStack providers={providers}>{children}</ProviderStack>;
+}: ProvidersProps<T>): ReactElement {
+  return providers.reduceRight(
+    (node, [Provider, props]) => (
+      <Provider key={Provider.name} {...(props as any)}>
+        {node}
+      </Provider>
+    ),
+    children || null
+  ) as ReactElement;
 }

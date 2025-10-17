@@ -1,6 +1,7 @@
 import type React from "react";
 import { useCallback, useMemo, useState } from "react";
-import { type Theme, ThemeContext } from "./theme-context";
+import type { Theme } from "./theme-context";
+import { ThemeContext } from "./theme-context";
 
 export function ThemeProvider({
   initialTheme = "light",

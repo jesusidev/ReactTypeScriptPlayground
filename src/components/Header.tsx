@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import { useContext } from "react";
 import { useCart } from "../hooks/use-cart";
 import { ThemeContext } from "../state/theme/theme-context";
 
@@ -112,6 +112,7 @@ export function Header() {
                       }}
                     >
                       <button
+                        type="button"
                         onClick={() =>
                           updateQuantity(item.id, item.quantity - 1)
                         }
@@ -125,6 +126,7 @@ export function Header() {
                       </span>
 
                       <button
+                        type="button"
                         onClick={() =>
                           updateQuantity(item.id, item.quantity + 1)
                         }
@@ -134,6 +136,7 @@ export function Header() {
                       </button>
 
                       <button
+                        type="button"
                         onClick={() => removeItem(item.id)}
                         style={{
                           padding: "0.25rem 0.5rem",

@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import { useContext } from "react";
 import { useCart } from "../hooks/use-cart";
 import { ThemeContext } from "../state/theme/theme-context";
 
@@ -89,6 +89,7 @@ export function ProductCard({ product }: { product: Product }) {
         </span>
 
         <button
+          type="button"
           onClick={handleAddToCart}
           style={{
             padding: "0.5rem 1rem",
@@ -103,7 +104,13 @@ export function ProductCard({ product }: { product: Product }) {
           onMouseOver={(e) => {
             e.currentTarget.style.backgroundColor = "#218838";
           }}
+          onFocus={(e) => {
+            e.currentTarget.style.backgroundColor = "#218838";
+          }}
           onMouseOut={(e) => {
+            e.currentTarget.style.backgroundColor = "#28a745";
+          }}
+          onBlur={(e) => {
             e.currentTarget.style.backgroundColor = "#28a745";
           }}
         >
