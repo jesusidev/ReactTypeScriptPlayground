@@ -1,4 +1,3 @@
-````markdown
 # 🎓 React TypeScript Learning Playground
 
 > **An educational project showcasing modern React patterns, experimental features, and professional development practices**
