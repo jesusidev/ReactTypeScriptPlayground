@@ -1,0 +1,12 @@
+# Build outputs
+dist/
+.parcel-cache/
+node_modules/
+
+# Generated files
+*.min.js
+*.bundle.js
+*.map
+
+# Parcel build outputs
+*.*.js
