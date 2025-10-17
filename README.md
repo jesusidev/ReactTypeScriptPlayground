@@ -320,6 +320,326 @@ const CartContext = createContext<CartContextValue | undefined>(undefined);
 
 ---
 
+## 🔄 useReducer Pattern for Complex State
+
+> **🎓 Learning Goal**: Upgrade from useState to useReducer for complex state management with predictable state transitions and better separation of concerns
+
+### 🤔 When to Evolve from useState to useReducer
+
+#### **useState is Great for Simple State**
+```tsx
+// ✅ Perfect for simple, independent state
+const [count, setCount] = useState(0);
+const [isVisible, setIsVisible] = useState(true);
+const [username, setUsername] = useState('');
+```
+
+#### **useReducer Shines for Complex State Logic**
+```tsx
+// ✅ Better for complex state with business rules
+const [cartState, dispatch] = useReducer(cartReducer, initialState);
+
+// Multiple related state updates
+dispatch({ type: 'ADD_ITEM', payload: { id: '1', name: 'Product', price: 10 } });
+dispatch({ type: 'UPDATE_QUANTITY', payload: { id: '1', quantity: 3 } });
+dispatch({ type: 'APPLY_DISCOUNT', payload: { code: 'SAVE10' } });
+```
+
+### 🚀 Real-World Example: Cart State Evolution
+
+#### **Before: useState Approach**
+```tsx
+// 📁 state/cart/cart-provider.tsx (old implementation)
+export function CartProvider({ children }: { children: React.ReactNode }) {
+  const [items, setItems] = useState<CartItem[]>([]);
+
+  const addItem = useCallback((newItem: Omit<CartItem, "quantity">) => {
+    setItems((currentItems) => {
+      const existingItem = currentItems.find(item => item.id === newItem.id);
+      if (existingItem) {
+        // Complex logic mixed with state updates
+        return currentItems.map(item =>
+          item.id === newItem.id
+            ? { ...item, quantity: item.quantity + 1 }
+            : item
+        );
+      } else {
+        return [...currentItems, { ...newItem, quantity: 1 }];
+      }
+    });
+  }, []);
+
+  const removeItem = useCallback((id: string) => {
+    setItems(currentItems => currentItems.filter(item => item.id !== id));
+  }, []);
+
+  const updateQuantity = useCallback((id: string, quantity: number) => {
+    setItems(currentItems =>
+      quantity <= 0
+        ? currentItems.filter(item => item.id !== id)
+        : currentItems.map(item =>
+            item.id === id ? { ...item, quantity } : item
+          )
+    );
+  }, []);
+
+  // Problems:
+  // 1. Business logic scattered across multiple functions
+  // 2. Each function needs to understand state structure  
+  // 3. Complex state updates are error-prone
+  // 4. Hard to test business logic in isolation
+}
+```
+
+#### **After: useReducer Approach**
+```tsx
+// 📁 state/cart/cart-reducer.ts - Centralized business logic
+export type CartAction =
+  | { type: 'ADD_ITEM'; payload: Omit<CartItem, 'quantity'> }
+  | { type: 'REMOVE_ITEM'; payload: { id: string } }
+  | { type: 'UPDATE_QUANTITY'; payload: { id: string; quantity: number } }
+  | { type: 'CLEAR_CART' };
+
+export const initialCartState: CartItem[] = [];
+
+export function cartReducer(state: CartItem[], action: CartAction): CartItem[] {
+  switch (action.type) {
+    case 'ADD_ITEM': {
+      const { payload: newItem } = action;
+      const existingItem = state.find(item => item.id === newItem.id);
+      
+      if (existingItem) {
+        return state.map(item =>
+          item.id === newItem.id
+            ? { ...item, quantity: item.quantity + 1 }
+            : item
+        );
+      }
+      
+      return [...state, { ...newItem, quantity: 1 }];
+    }
+    
+    case 'REMOVE_ITEM': {
+      return state.filter(item => item.id !== action.payload.id);
+    }
+    
+    case 'UPDATE_QUANTITY': {
+      const { id, quantity } = action.payload;
+      
+      if (quantity <= 0) {
+        return state.filter(item => item.id !== id);
+      }
+      
+      return state.map(item =>
+        item.id === id ? { ...item, quantity } : item
+      );
+    }
+    
+    case 'CLEAR_CART': {
+      return [];
+    }
+    
+    default: {
+      return state;
+    }
+  }
+}
+
+// ✨ Action creators for clean dispatching
+export const cartActions = {
+  addItem: (item: Omit<CartItem, 'quantity'>): CartAction => ({
+    type: 'ADD_ITEM',
+    payload: item
+  }),
+  
+  removeItem: (id: string): CartAction => ({
+    type: 'REMOVE_ITEM', 
+    payload: { id }
+  }),
+  
+  updateQuantity: (id: string, quantity: number): CartAction => ({
+    type: 'UPDATE_QUANTITY',
+    payload: { id, quantity }
+  }),
+  
+  clearCart: (): CartAction => ({
+    type: 'CLEAR_CART'
+  })
+};
+```
+
+#### **Updated Provider with useReducer**
+```tsx
+// 📁 state/cart/cart-provider.tsx (new implementation)
+export function CartProvider({ children }: { children: React.ReactNode }) {
+  const [items, dispatch] = useReducer(cartReducer, initialCartState);
+
+  // ✨ Clean, simple action dispatchers
+  const addItem = useCallback((newItem: Omit<CartItem, "quantity">) => {
+    dispatch(cartActions.addItem(newItem));
+  }, []);
+
+  const removeItem = useCallback((id: string) => {
+    dispatch(cartActions.removeItem(id));
+  }, []);
+
+  const updateQuantity = useCallback((id: string, quantity: number) => {
+    dispatch(cartActions.updateQuantity(id, quantity));
+  }, []);
+
+  const clearCart = useCallback(() => {
+    dispatch(cartActions.clearCart());
+  }, []);
+
+  // Benefits:
+  // 1. All business logic centralized in reducer
+  // 2. Actions are predictable and type-safe
+  // 3. Easy to test reducer in isolation  
+  // 4. State transitions are explicit and traceable
+  // 5. Component logic is simplified
+}
+```
+
+### 🎯 Key Benefits of useReducer Pattern
+
+#### **🏗️ Architectural Advantages**
+✅ **Centralized Logic**: All state transitions in one place (reducer)  
+✅ **Predictable Updates**: Actions clearly describe what happened  
+✅ **Type Safety**: Union types ensure correct action shapes  
+✅ **Testability**: Reducer is a pure function - easy to test  
+✅ **Debugging**: Action history shows exactly what changed  
+✅ **Scalability**: Easy to add new actions without touching components  
+
+#### **🎨 Clean Code Benefits**
+✅ **Separation of Concerns**: Business logic separate from UI logic  
+✅ **Single Responsibility**: Reducer handles state, components handle UI  
+✅ **Immutable Updates**: Reducer enforces immutable state changes  
+✅ **Action Creators**: Consistent way to create actions with validation  
+
+### 📚 Step-by-Step Migration Guide
+
+#### **Step 1: Identify Complex State**
+Look for these patterns in your useState code:
+- Multiple related state variables
+- Complex state update logic  
+- State updates that depend on current state
+- Business rules scattered across components
+
+#### **Step 2: Define Your Actions**
+```tsx
+// Start with your current operations
+// addItem, removeItem, updateQuantity, clearCart
+// ↓
+// Convert to action types
+type CartAction = 
+  | { type: 'ADD_ITEM'; payload: Omit<CartItem, 'quantity'> }
+  | { type: 'REMOVE_ITEM'; payload: { id: string } }
+  // ...
+```
+
+#### **Step 3: Build Your Reducer**
+```tsx
+function cartReducer(state: CartState, action: CartAction): CartState {
+  switch (action.type) {
+    case 'ADD_ITEM':
+      // Move your existing logic here
+      return /* new state */;
+    // ...
+  }
+}
+```
+
+#### **Step 4: Create Action Creators**
+```tsx
+export const cartActions = {
+  addItem: (item: Omit<CartItem, 'quantity'>) => ({
+    type: 'ADD_ITEM' as const,
+    payload: item
+  }),
+  // ... other actions
+};
+```
+
+#### **Step 5: Update Your Provider**
+```tsx
+// Replace useState with useReducer
+const [state, dispatch] = useReducer(cartReducer, initialState);
+
+// Replace complex setters with simple dispatches
+const addItem = useCallback((item) => {
+  dispatch(cartActions.addItem(item));
+}, []);
+```
+
+### 🧪 Advanced Patterns
+
+#### **Barrel Exports for Clean Imports**
+```tsx
+// 📁 state/cart/index.ts - Clean module organization
+export type { CartItem, CartContextValue } from './cart-context';
+export { CartContext, useCart } from './cart-context';
+export { CartProvider } from './cart-provider';
+export { cartActions, cartReducer, initialCartState } from './cart-reducer';
+export type { CartAction } from './cart-reducer';
+
+// ✨ Now components can import everything cleanly:
+import { useCart, cartActions, type CartItem } from '../state/cart';
+```
+
+#### **Async Actions with useReducer**
+```tsx
+// For async operations, dispatch actions at different stages
+const saveCart = async () => {
+  dispatch({ type: 'SAVE_CART_START' });
+  
+  try {
+    await api.saveCart(items);
+    dispatch({ type: 'SAVE_CART_SUCCESS' });
+  } catch (error) {
+    dispatch({ type: 'SAVE_CART_ERROR', payload: { error: error.message } });
+  }
+};
+```
+
+### ⚡ When to Choose useReducer vs useState
+
+#### **Use useState when:**
+- Simple, independent state (booleans, strings, numbers)
+- No complex business logic
+- State updates are straightforward
+- Component-local state only
+
+#### **Use useReducer when:**
+- Complex state with multiple related fields
+- State updates involve business logic
+- Multiple ways to update the same state
+- Need predictable state transitions
+- Want better testability and debugging
+
+### 🎯 Real-World Impact
+
+**Before useReducer (complex setState calls):**
+```tsx
+// Hard to understand what this does
+setItems(items => 
+  items.map(item => 
+    item.id === id 
+      ? { ...item, quantity: item.quantity + (item.bulk ? 5 : 1) }
+      : item
+  )
+);
+```
+
+**After useReducer (clear intent):**
+```tsx
+// Crystal clear what's happening
+dispatch(cartActions.incrementQuantity(id, isBulkOperation));
+```
+
+The useReducer pattern transforms complex state management from scattered, hard-to-follow logic into organized, predictable, and testable code. It's especially powerful when combined with TypeScript for complete type safety throughout your state management layer.
+
+---
+
 ## ⚡ useEffectEvent Hook
 
 > **🧪 Experimental Feature**: This is a cutting-edge React pattern that may change in future versions  
