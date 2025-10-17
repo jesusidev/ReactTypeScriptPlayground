@@ -1,13 +1,14 @@
 import type React from "react";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useReducer, useRef } from "react";
 import { useAnalyticsDispatcher } from "../../events/use-analytics-events";
 import { useCartEvent } from "../../events/use-cart-events";
 import { useNotifyDispatcher } from "../../events/use-notification-events";
 import type { CartItem } from "./cart-context";
 import { CartContext } from "./cart-context";
+import { cartActions, cartReducer, initialCartState } from "./cart-reducer";
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
-  const [items, setItems] = useState<CartItem[]>([]);
+  const [items, dispatch] = useReducer(cartReducer, initialCartState);
   const previousItemsRef = useRef<CartItem[]>([]);
 
   // Event dispatchers using the new modular system
@@ -82,40 +83,16 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   ]);
 
   const addItem = useCallback((newItem: Omit<CartItem, "quantity">) => {
-    setItems((currentItems) => {
-      const existingItem = currentItems.find((item) => item.id === newItem.id);
-
-      if (existingItem) {
-        return currentItems.map((item) =>
-          item.id === newItem.id
-            ? { ...item, quantity: item.quantity + 1 }
-            : item
-        );
-      } else {
-        return [...currentItems, { ...newItem, quantity: 1 }];
-      }
-    });
+    dispatch(cartActions.addItem(newItem));
   }, []);
 
   const removeItem = useCallback((id: string) => {
-    setItems((currentItems) => currentItems.filter((item) => item.id !== id));
+    dispatch(cartActions.removeItem(id));
   }, []);
 
-  const updateQuantity = useCallback(
-    (id: string, quantity: number) => {
-      if (quantity <= 0) {
-        removeItem(id);
-        return;
-      }
-
-      setItems((currentItems) =>
-        currentItems.map((item) =>
-          item.id === id ? { ...item, quantity } : item
-        )
-      );
-    },
-    [removeItem]
-  );
+  const updateQuantity = useCallback((id: string, quantity: number) => {
+    dispatch(cartActions.updateQuantity(id, quantity));
+  }, []);
 
   const getTotalItems = useCallback(() => {
     return items.reduce((total, item) => total + item.quantity, 0);
@@ -126,7 +103,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   }, [items]);
 
   const clearCart = useCallback(() => {
-    setItems([]);
+    dispatch(cartActions.clearCart());
   }, []);
 
   const value = useMemo(

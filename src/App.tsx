@@ -7,7 +7,7 @@ import { NotificationCenter } from "./components/NotificationCenter";
 import { ProductCard } from "./components/ProductCard";
 import { Theme } from "./components/Theme";
 import { sampleProducts } from "./data/products";
-import { CartProvider } from "./state/cart/cart-provider";
+import { CartProvider } from "./state/cart";
 import { Providers } from "./state/provider-builder";
 import { ThemeContext } from "./state/theme/theme-context";
 import { ThemeProvider } from "./state/theme/theme-provider";
